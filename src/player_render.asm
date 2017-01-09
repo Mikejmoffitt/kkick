@@ -5,36 +5,10 @@
 ; No particular pre-conditions; this is a wrapper for the various subroutines
 ; which draw both players to the screen.
 player_render:
-	jsr player_choose_direction
 	jsr player_choose_animation
 	jsr player_choose_mapping
 	jsr player_animate
 	jsr player_draw
-	rts
-
-
-player_choose_direction:
-; TODO: Vet whether or not direction should be changeable in mid-air
-;	; Is player on the ground?
-;	lda player_is_grounded
-;	bne @do_dir_sel
-;	rts
-@do_dir_sel:
-; If so, change the direction based on the sign of dx
-	lda player_dx
-	bne @nonzero
-	lda player_dx+1
-	bne @nonzero
-	rts	; Exit if dx is totally zero
-@nonzero:
-	lda player_dx+1
-	bmi :+
-	lda #$00
-	sta player_dir
-	rts
-:
-	lda #$01
-	sta player_dir
 	rts
 
 ; Based on player state (position, action, etc) choose an animation sequence
@@ -43,27 +17,7 @@ player_choose_direction:
 ;	If appropriate, the player's animation number will have changed, and
 ;	the animation address will update as well.
 player_choose_animation:
-	lda player_is_grounded
-	beq @airborne
-	lda player_dx
-	bne @nonzero_dx
-	lda player_dx+1
-	bne @nonzero_dx
-	lda #ANIM_STAND
-	jsr player_set_anim_num
-	rts
-@nonzero_dx:
-	lda #ANIM_RUN
-	jsr player_set_anim_num
-	rts
-@airborne:
-	lda player_dy+1
-	bmi @dy_neg
-	lda #ANIM_FALL
-	jsr player_set_anim_num
-	rts
-@dy_neg:
-	lda #ANIM_JUMP
+	lda #ANIM_KICK_FWD
 	jsr player_set_anim_num
 	rts
 
@@ -227,13 +181,12 @@ player_animate:
 ;	addr_ptr is loaded with the address of the animation frame struct.
 player_draw:
 
-	lda player_xpos+1
+	lda #$7F
 	sta temp
-	lda player_ypos+1
+	lda #$70
 	sta temp2
-;	fix12_to_8 player_xpos, temp
-;	fix12_to_8 player_ypos, temp2
 	lda player_dir
+	and #$01 ; Clamp to a flag dictating whether it should flip
 	sta temp3
 	lda #34
 	sta temp4

@@ -45,14 +45,15 @@
 ; col_map as well.
 ;	X: Low byte of NT address
 ;	Y: High byte of NT address
-decomp_room:
+;	A: High byte of PPU address
+unpack_nt:
 	; Get the nametable address in ZP
 	stx addr_ptr
 	sty addr_ptr+1
 	
 	; Get set up to write to the nametable
 	bit PPUSTATUS ; Reset address latch
-	lda #$20
+;	lda #$20
 	sta PPUADDR ; Write $2000 to
 	ldy #$00
 	sty PPUADDR ; PPUADDR latch

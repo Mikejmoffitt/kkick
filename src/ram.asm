@@ -28,10 +28,11 @@ player_anim_len:	.res 1		; Current animation script length
 player_anim_frame:	.res 1		; Frame index into animation script
 player_anim_cnt:	.res 1		; Animation accumulator
 
+player_score:		.res 3		; BCD storage of player score
+player_lives:		.res 1
+
 
 .segment "RAM"
-
-
 
 ; Famitone stuff
 FT_BASE_ADR:		.res 256

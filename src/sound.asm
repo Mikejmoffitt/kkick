@@ -29,15 +29,13 @@ play_track:
 
 ; DPCM playback for "WHOA" sound
 play_whoa_sound:
-	lda #%00000000
-	sta $4015
 	lda #%00001111
 	sta $4010
 	lda #$CC
 	sta $4012
 	lda #$80
 	sta $4013
-	lda #%00010000
+	lda #%00011111
 	sta $4015
 
 	rts

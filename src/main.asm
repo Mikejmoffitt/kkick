@@ -12,6 +12,8 @@ MAP_END = $FE
 .include "metasprite.asm"
 .include "famitone.asm"
 .include "sound.asm"
+.include "score.asm"
+.include "player.asm"
 
 .segment "FIXED"
 ; =============================
@@ -143,9 +145,14 @@ reset_vector:
 ; =============================================================================
 main_entry:
 	ppu_disable
-	ldx #<ntcomp
-	ldy #>ntcomp
-	jsr decomp_room
+	ldx #<main_comp
+	ldy #>main_comp
+	lda #$20
+	jsr unpack_nt
+	ldx #<title_comp
+	ldy #>title_comp
+	lda #$24
+	jsr unpack_nt
 
 	; Load in a palette
 	ppu_load_spr_palette sample_spr_palette_data
@@ -155,16 +162,10 @@ main_entry:
 ; Sound test
 	lda #$00
 	jsr play_track
-	; Make some noise
-;	ldx #<testmus_music_data
-;	ldy #>testmus_music_data
-;	lda #80
-;	jsr FamiToneInit
-;	lda #$00
-;;	jsr FamiToneMusicPlay
 
 	; Bring the PPU back up.
 	jsr wait_nmi
+	ppu_load_scroll xscroll, yscroll
 
 	ppu_enable
 
@@ -173,20 +174,14 @@ main_top_loop:
 	; Run game logic here
 	jsr read_joy_safe
 	jsr FamiToneUpdate
-
-	key_down pad_1, btn_a
-	jsr play_ack_sound
-:
-	key_down pad_1, btn_b
-	jsr play_whoa_sound
-:
+	jsr player_render
 
 	; End of game logic frame; wait for NMI (vblank) to begin
 	jsr wait_nmi
 
 	; Commit VRAM updates while PPU is disabled in vblank
 	ppu_disable
-
+	jsr draw_score
 	spr_dma
 	ppu_load_scroll xscroll, yscroll
 
@@ -196,17 +191,19 @@ main_top_loop:
 	jmp main_top_loop; loop forever
 
 
-ntcomp:
+main_comp:
 	.incbin "resources/main_table.bin"
+title_comp:
+	.incbin "resources/title_table.bin"
 
 main_bg_palette:
 	.byte	$0F, $15, $30, $0F
-	.byte	$0F, $17, $27, $37
+	.byte	$0F, $17, $27, $38
 	.byte	$0F, $17, $27, $37
 	.byte	$0F, $17, $27, $37
 
 sample_spr_palette_data:
-	.byte	$0F, $01, $30, $27
+	.byte	$0F, $36, $30, $0F
 	.byte	$0F, $02, $24, $30
 	.byte	$0F, $06, $26, $30
 	.byte	$0F, $2C, $24, $2A
