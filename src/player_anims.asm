@@ -274,7 +274,7 @@ pl_anim_kick_fwd:
 	.addr	pl_mapping_stand_fwd1
 	.byte	1, 0
 	.addr	pl_mapping_kick_fwd1
-	.byte	1, 0
+	.byte	3, 0
 	.addr	pl_mapping_kick_fwd5
 	.byte	1, 0
 	.addr	pl_mapping_kick_fwd3
@@ -300,7 +300,7 @@ pl_anim_kick_back:
 	.addr	pl_mapping_stand_back1
 	.byte	1, 0
 	.addr	pl_mapping_kick_back1
-	.byte	1, 0
+	.byte	3, 0
 	.addr	pl_mapping_kick_back4
 	.byte	1, 0
 	.addr	pl_mapping_kick_back5
