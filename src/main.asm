@@ -1,5 +1,3 @@
-; iNES Header
-
 MAP_END = $FE
 
 .segment "FIXED"
@@ -145,10 +143,13 @@ reset_vector:
 ; =============================================================================
 main_entry:
 	ppu_disable
+
+	; Set up main and title screens
 	ldx #<main_comp
 	ldy #>main_comp
 	lda #$20
 	jsr unpack_nt
+
 	ldx #<title_comp
 	ldy #>title_comp
 	lda #$24
@@ -160,8 +161,11 @@ main_entry:
 	
 
 ; Sound test
-	lda #$00
-	jsr play_track
+	;lda #$00
+	;jsr play_track
+
+	; Initialize the player struct
+	jsr player_init
 
 	; Bring the PPU back up.
 	jsr wait_nmi
@@ -174,6 +178,7 @@ main_top_loop:
 	; Run game logic here
 	jsr read_joy_safe
 	jsr FamiToneUpdate
+	jsr player_logic
 	jsr player_render
 
 	; End of game logic frame; wait for NMI (vblank) to begin

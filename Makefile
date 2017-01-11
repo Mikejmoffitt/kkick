@@ -27,6 +27,7 @@ resources:
 	-tools/text2data/text2data -ca65 raw_resources/kk_main.txt
 	mv raw_resources/kk_main.s resources/kk_main.asm
 	tools/rle_nt/comp raw_resources/main_table.nam > resources/main_table.bin
+	tools/rle_nt/comp raw_resources/title_table.nam > resources/title_table.bin
 
 $(EXECUTABLE):
 	$(AS) $(SRCDIR)/$(TOPLEVEL) $(ASFLAGS) -I $(SRCDIR) -l $(LISTNAME) -o $(OBJNAME)

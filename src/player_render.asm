@@ -17,9 +17,42 @@ player_render:
 ;	If appropriate, the player's animation number will have changed, and
 ;	the animation address will update as well.
 player_choose_animation:
+	lda player_kick_cnt
+	beq @not_kicking
+	lda player_dir
+	and #%00000010
+	cmp #$00
+	bne @facing_down_kick
+	lda #ANIM_KICK_BACK
+	jsr player_set_anim_num
+	rts
+
+@facing_down_kick:
 	lda #ANIM_KICK_FWD
 	jsr player_set_anim_num
 	rts
+
+@not_kicking:
+	lda player_dir
+	and #%00000010
+	cmp #$00
+	bne @facing_down_stand
+	lda #ANIM_STAND_BACK
+	jsr player_set_anim_num
+	rts
+
+@facing_down_stand:
+	lda #ANIM_STAND_FWD
+	jsr player_set_anim_num
+	rts
+
+; Puts an animation back to its first frame
+player_reset_animation:
+	lda #$00
+	sta player_anim_frame
+	sta player_anim_cnt
+	rts
+
 
 ; Sets the player's animation to the number loaded in A. If the animation is
 ; already loaded, do nothing. Otherwise, reset animation counters.
@@ -33,14 +66,9 @@ player_choose_animation:
 ;		-Animation frame accumulator (ANIM_CNT) (reset to zero)
 ;		-Animation frame number (ANIM_FRAME) (reset to zero)
 player_set_anim_num:
-
 	sta temp3				; Store number argument
 	cmp player_anim_num
 	beq @done	; If we're already in this animation, don't bother
-	sta player_anim_num
-	lda #$00
-	sta player_anim_cnt
-	sta player_anim_frame
 
 	; First we need the address of the animation script from the map
 	lda #<pl_anim_num_map
@@ -187,6 +215,7 @@ player_draw:
 	sta temp2
 	lda player_dir
 	and #$01 ; Clamp to a flag dictating whether it should flip
+	eor #$01
 	sta temp3
 	lda #34
 	sta temp4

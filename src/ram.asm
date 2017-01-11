@@ -21,14 +21,16 @@ pad_2_prev:		.res 1
 FT_TEMP:		.res 3
 
 player_dir:		.res 1		; 0 for up-left, 1 for up-right, 2 for down-left, 3 for down-right
-player_anim_map:	.res 2		; List of animation script pointers
 player_anim_num:	.res 1		; Which animation list
 player_anim_addr:	.res 2		; Current animation script pointer
 player_anim_len:	.res 1		; Current animation script length
 player_anim_frame:	.res 1		; Frame index into animation script
 player_anim_cnt:	.res 1		; Animation accumulator
 
+player_kick_cnt:	.res 1		; If nonzero, a kick anim is happening
+
 player_score:		.res 3		; BCD storage of player score
+player_hp:		.res 1
 player_lives:		.res 1
 
 
