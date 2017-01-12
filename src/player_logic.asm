@@ -43,7 +43,7 @@ player_handle_input:
 ; Debug kick anim test
 	key_down pad_1, btn_a
 	jsr player_reset_animation
-	lda #19
+	lda #21
 	sta player_kick_cnt
 :
 
