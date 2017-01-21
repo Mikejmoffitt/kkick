@@ -19,6 +19,8 @@ pad_1_prev:		.res 1
 pad_2:			.res 1
 pad_2_prev:		.res 1
 FT_TEMP:		.res 3
+rand_seed:		.res 2
+spr_alloc:		.res 1
 
 player_dir:		.res 1		; 0 for up-left, 1 for up-right, 2 for down-left, 3 for down-right
 player_anim_num:	.res 1		; Which animation list
@@ -33,6 +35,13 @@ player_score:		.res 3		; BCD storage of player score
 player_hp:		.res 1
 player_lives:		.res 1
 
+fiends_gen_cnt:		.res 1		; countdown to spawning a bad dude
+fiends_speed:		.res 2		; 8.8 dx and (dy*2) for approaching
+
+fiend_xpos_hi:		.res (1 * NUM_FIENDS)
+fiend_ypos_hi:		.res (1 * NUM_FIENDS)
+fiend_xpos_lo:		.res (1 * NUM_FIENDS)
+fiend_ypos_lo:		.res (1 * NUM_FIENDS)
 
 .segment "RAM"
 
@@ -55,3 +64,7 @@ btn_up:		.res 1
 btn_down:	.res 1
 btn_left:	.res 1
 btn_right:	.res 1
+
+fiend_state:		.res (1 * NUM_FIENDS)
+fiend_death_cnt:	.res (1 * NUM_FIENDS)
+fiend_dir:		.res (1 * NUM_FIENDS)

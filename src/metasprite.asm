@@ -3,11 +3,15 @@ METASPRITE_MAX_TILES = (24*4)
 .segment "FIXED"
 ; Draws a metasprite to the screen. 
 ; Preconditions:
-;	Put screen X in temp and screen Y in temp2.
+;	Put screen X in X and screen Y in Y.
 ;	Temp3 flips about the Y axis (horizontally)
-;	Temp4 has the starting sprite number.
 ;	Put the metasprite structure's address in addr_ptr
+;	Starting sprite is specified with spr_alloc
 draw_metasprite:
+	txa
+	sta temp
+	tya
+	sta temp2
 
 	; Normalize the flip flag to exactly #$40
 	lda temp3
@@ -16,9 +20,8 @@ draw_metasprite:
 	sta temp3
 @post_flip_fix:
 
-	lda temp4
-	asl
-	asl
+; Set up initial sprite number
+	lda spr_alloc
 	tay
 	sta temp4
 	sub16 addr_ptr, temp4
@@ -29,12 +32,18 @@ draw_metasprite:
 	
 
 @oam_copy_loop:
+
+	lda spr_alloc
+	clc
+	adc #$04
+	sta spr_alloc
 	; Y = OAM Y position
 	lda (addr_ptr), y		; Y pos relative to metasprite
 	cmp #MAP_END			; Check unused flag
 	beq @end_frame			; Y-Pos was MAP_END; terminate loop
 	clc
 	adc temp2			; Offset from sprite's Y center
+	sec
 	sbc yscroll			; Factor in scrolling position
 	sta OAM_BASE, y
 	iny				; Y = OAM tile select
@@ -95,3 +104,19 @@ draw_metasprite:
 	bne @end_frame			; for this metasprite.
 	rts
 
+extra_spr_clear:
+	lda $5555
+	lda spr_alloc
+	lsr
+	lsr
+	tax
+	lda #$FE
+:
+	sta OAM_BASE, x
+	inx
+	inx
+	inx
+	inx
+	bne :-
+
+	rts

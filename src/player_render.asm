@@ -209,16 +209,12 @@ player_animate:
 ;	addr_ptr is loaded with the address of the animation frame struct.
 player_draw:
 
-	lda #$7F
-	sta temp
-	lda #$70
-	sta temp2
+	ldx #$7F
+	ldy #$70
 	lda player_dir
 	and #$01 ; Clamp to a flag dictating whether it should flip
 	eor #$01
 	sta temp3
-	lda #34
-	sta temp4
 	jsr draw_metasprite
 	rts
 

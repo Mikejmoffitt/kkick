@@ -45,6 +45,8 @@ player_handle_input:
 	jsr player_reset_animation
 	lda #21
 	sta player_kick_cnt
+
+	jsr play_whoa_sound
 :
 
 	rts

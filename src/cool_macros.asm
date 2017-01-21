@@ -223,6 +223,8 @@ OAM_BASE		= $200
 .macro spr_dma
 	lda #$02
 	sta OAMDMA
+	lda #$00
+	sta spr_alloc
 .endmacro
 
 ; Latch the PPU address; mangles A

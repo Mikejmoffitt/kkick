@@ -1,4 +1,10 @@
 MAP_END = $FE
+NUM_FIENDS = 5
+
+DIR_UP_LEFT    = %00000000
+DIR_UP_RIGHT   = %00000001
+DIR_DOWN_LEFT  = %00000010
+DIR_DOWN_RIGHT = %00000011
 
 .segment "FIXED"
 .include "nes.asm"
@@ -12,6 +18,7 @@ MAP_END = $FE
 .include "sound.asm"
 .include "score.asm"
 .include "player.asm"
+.include "fiends.asm"
 
 .segment "FIXED"
 ; =============================
@@ -21,7 +28,7 @@ MAP_END = $FE
 nmi_vector:
 	pha				; Preseve A
 	php
-	
+
 	lda #$00
 	sta PPUCTRL			; Disable NMI
 	sta vblank_flag
@@ -142,30 +149,12 @@ reset_vector:
 ; ====                                                                     ====
 ; =============================================================================
 main_entry:
-	ppu_disable
-
-	; Set up main and title screens
-	ldx #<main_comp
-	ldy #>main_comp
-	lda #$20
-	jsr unpack_nt
-
-	ldx #<title_comp
-	ldy #>title_comp
-	lda #$24
-	jsr unpack_nt
-
-	; Load in a palette
-	ppu_load_spr_palette sample_spr_palette_data
-	ppu_load_bg_palette main_bg_palette
-	
-
 ; Sound test
 	;lda #$00
 	;jsr play_track
 
-	; Initialize the player struct
-	jsr player_init
+	ppu_disable
+	jsr game_state_init
 
 	; Bring the PPU back up.
 	jsr wait_nmi
@@ -178,8 +167,14 @@ main_top_loop:
 	; Run game logic here
 	jsr read_joy_safe
 	jsr FamiToneUpdate
+	jsr fiends_logic
 	jsr player_logic
 	jsr player_render
+	jsr fiends_render
+
+	lda ppumask_config
+	ora #%11100000
+	sta PPUMASK
 
 	; End of game logic frame; wait for NMI (vblank) to begin
 	jsr wait_nmi
@@ -195,6 +190,25 @@ main_top_loop:
 
 	jmp main_top_loop; loop forever
 
+game_state_init:
+
+	; Set up main and title screens
+	ldx #<main_comp
+	ldy #>main_comp
+	lda #$20
+	jsr unpack_nt
+
+	ldx #<title_comp
+	ldy #>title_comp
+	lda #$24
+	jsr unpack_nt
+
+	; Load in a palette
+	ppu_load_spr_palette sample_spr_palette_data
+	ppu_load_bg_palette main_bg_palette
+	jsr player_init
+	jsr fiends_init
+	rts
 
 main_comp:
 	.incbin "resources/main_table.bin"

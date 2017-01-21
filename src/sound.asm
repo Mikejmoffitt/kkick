@@ -37,9 +37,7 @@ play_whoa_sound:
 	sta $4013
 	lda #%00011111
 	sta $4015
-
 	rts
-
 
 waste_time:
 	rol
