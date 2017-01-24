@@ -42,13 +42,13 @@ player_handle_input:
 
 ; Debug kick anim test
 	key_down pad_1, btn_a
-	jsr player_reset_animation
-	lda #21
-	sta player_kick_cnt
-
-	jsr play_whoa_sound
+	;jsr player_reset_animation
+	;lda #21
+	;sta player_kick_cnt
+	lda player_dir
+	jsr fiend_spawn
+	;jsr play_whoa_sound
 :
-
 	rts
 
 player_detect_collisions:

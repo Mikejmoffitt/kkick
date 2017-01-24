@@ -8,8 +8,8 @@ FIEND_STATE_ATTACKED = 3
 FIEND_STATE_DYING = 4
 FIEND_STATE_DEAD = 5
 
-FIENDS_SPEED_START_HI = 0
-FIENDS_SPEED_START_LO = $80
+FIENDS_SPEED_START_HI = 1
+FIENDS_SPEED_START_LO = 0
 
 FIEND_CENTER = $7F
 FIEND_ATK_RANGE = 30
@@ -19,6 +19,12 @@ FIEND_LEFT_ATK_BOUND = (FIEND_CENTER + FIEND_ATK_RANGE)
 FIEND_RIGHT_ATK_BOUND = (FIEND_CENTER - FIEND_ATK_RANGE)
 FIEND_LEFT_HIT_BOUND = (FIEND_CENTER + FIEND_HIT_RANGE)
 FIEND_RIGHT_HIT_BOUND = (FIEND_CENTER - FIEND_HIT_RANGE)
+
+FIEND_SPAWN_DISTANCE = 80
+FIEND_SPAWN_LEFT = ($7F - FIEND_SPAWN_DISTANCE)
+FIEND_SPAWN_RIGHT = ($7F + FIEND_SPAWN_DISTANCE)
+FIEND_SPAWN_TOP = ($70 - FIEND_SPAWN_DISTANCE/2)
+FIEND_SPAWN_BOTTOM = ($70 + FIEND_SPAWN_DISTANCE/2)
 
 KICK_THRESH = 10
 
@@ -70,6 +76,8 @@ fiend_walk_back4:
 	.byte	<-8,  $BF, %00000000, 0
 	.byte	MAP_END
 
+
+; ----- Exported fiend functions -----
 ; Clear out state for fiends
 fiends_init:
 
@@ -84,27 +92,16 @@ fiends_init:
 
 	dey
 	ldx #NUM_FIENDS
-:
 	lda #$00
-	sta fiend_xpos_lo, x
-	sta fiend_xpos_hi, x
-	sty fiend_ypos_lo, x
-	sty fiend_ypos_hi, x
-	sta fiend_state, x
-	sta fiend_death_cnt, x
-
-	txa
-	asl
-	asl
-	asl
-	sta fiend_xpos_hi, x
-
-	asl
-	sta fiend_ypos_hi, x
-
-	lda #$01
-
-	sta fiend_state, x
+:
+		sta fiend_xpos_lo, x
+		sta fiend_xpos_hi, x
+		sty fiend_ypos_lo, x
+		sty fiend_ypos_hi, x
+		sta fiend_state, x
+		sta fiend_death_cnt, x
+		sta fiend_dir, x
+		sta fiend_state, x
 	dex
 	bne :-
 
@@ -138,8 +135,63 @@ fiends_render:
 	bne :-
 	rts
 
+; Spawn fiend in direction specified in A
+fiend_spawn:
+	and #%00000011
+	sta temp
+	lda $5555
+	ldx #NUM_FIENDS
+:
+
+	lda fiend_state, x
+	bne @fiend_ng
+	; Idle fiend found. Initialize the one fiend and get out.
+	lda temp
+	jsr fiend_setup
+
 	rts
-; ======= Per-fiend functions - specific fiend specified in X
+@fiend_ng:
+	dex
+	bne :-
+	rts
+
+
+; ======= Per-fiend internal functions - specific fiend specified in X
+
+; Initializes the fiend in X, and spawns in direction in A
+fiend_setup:
+	sta fiend_dir, x
+	lda #$00
+	sta fiend_death_cnt, x
+	sta fiend_xpos_lo, x
+	sta fiend_ypos_lo, x
+	lda #FIEND_STATE_WALKING
+	sta fiend_state, x
+
+; Pick left or right side
+@choose_x_spot:
+	lda fiend_dir, x
+	and #%00000001
+	bne @facing_right
+@facing_left:
+	lda #FIEND_SPAWN_RIGHT
+	jmp @post_x
+@facing_right:
+	lda #FIEND_SPAWN_LEFT
+@post_x:
+	sta fiend_xpos_hi, x
+
+	lda fiend_dir, x
+	and #%00000010
+	bne @facing_down
+@facing_up:
+	lda #FIEND_SPAWN_BOTTOM
+	jmp @post_y
+@facing_down:
+	lda #FIEND_SPAWN_TOP
+@post_y:
+	sta fiend_ypos_hi, x
+	rts
 
 ; Renders fiend X based on state
 fiend_render:
@@ -187,6 +239,12 @@ fiend_move:
 	ror a
 	sta temp
 
+	; Check if the fiend is going left or right
+	lda fiend_dir, x
+	and #%00000001
+	beq @facing_left
+
+@facing_right:
 	; Add fiends_speed to X
 	clc
 	lda fiend_xpos_lo, x
@@ -195,7 +253,23 @@ fiend_move:
 	lda fiend_xpos_hi, x
 	adc fiends_speed+1
 	sta fiend_xpos_hi, x
+	jmp @do_y_addition
 
+@facing_left:
+	sec
+	lda fiend_xpos_lo, x
+	sbc fiends_speed
+	sta fiend_xpos_lo, x
+	lda fiend_xpos_hi, x
+	sbc fiends_speed+1
+	sta fiend_xpos_hi, x
+
+@do_y_addition:
+	lda fiend_dir, x
+	and #%00000010
+	beq @facing_up
+
+@facing_down:
 	; Add fiends_speed/2 to Y
 	clc
 	lda fiend_ypos_lo, x
@@ -204,6 +278,18 @@ fiend_move:
 	lda fiend_ypos_hi, x
 	adc temp+1
 	sta fiend_ypos_hi, x
+
+	rts
+@facing_up:
+	sec
+	lda fiend_ypos_lo, x
+	sbc temp
+	sta fiend_ypos_lo, x
+	lda fiend_ypos_hi, x
+	sbc temp+1
+	sta fiend_ypos_hi, x
+
+	rts
 
 	rts
 
@@ -276,4 +362,3 @@ fiend_detect_player_coll:
 ; TODO: Hurt the player.
 
 	rts
-
