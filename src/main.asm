@@ -246,7 +246,7 @@ title_comp:
 	.incbin "resources/title_table.bin"
 
 main_bg_palette:
-	.byte	$0F, $15, $30, $0F
+	.byte	$0F, $17, $30, $35
 	.byte	$0F, $17, $27, $38
 	.byte	$0F, $2A, $27, $2C
 	.byte	$0F, $36, $30, $01
