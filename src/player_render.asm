@@ -5,10 +5,21 @@
 ; No particular pre-conditions; this is a wrapper for the various subroutines
 ; which draw both players to the screen.
 player_render:
+	jsr player_latch_dir
 	jsr player_choose_animation
 	jsr player_choose_mapping
 	jsr player_animate
 	jsr player_draw
+	rts
+
+; Latch the player's display direction, only if not in the middle of a kick.
+player_latch_dir:
+	lda player_kick_cnt
+	beq :+
+	rts
+:
+	lda player_dir
+	sta player_disp_dir
 	rts
 
 ; Based on player state (position, action, etc) choose an animation sequence
@@ -19,7 +30,7 @@ player_render:
 player_choose_animation:
 	lda player_kick_cnt
 	beq @not_kicking
-	lda player_dir
+	lda player_disp_dir
 	and #%00000010
 	cmp #$00
 	bne @facing_down_kick
@@ -33,7 +44,7 @@ player_choose_animation:
 	rts
 
 @not_kicking:
-	lda player_dir
+	lda player_disp_dir
 	and #%00000010
 	cmp #$00
 	bne @facing_down_stand
@@ -208,10 +219,9 @@ player_animate:
 ; Preconditions:
 ;	addr_ptr is loaded with the address of the animation frame struct.
 player_draw:
-
 	ldx #$7F
 	ldy #$70
-	lda player_dir
+	lda player_disp_dir
 	and #$01 ; Clamp to a flag dictating whether it should flip
 	eor #$01
 	sta temp3

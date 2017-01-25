@@ -19,6 +19,8 @@ player_counters:
 	rts
 
 player_trigger_kick_anim:
+	lda player_dir
+	sta player_disp_dir
 	jsr player_reset_animation
 	lda #21
 	sta player_kick_cnt

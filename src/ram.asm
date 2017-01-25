@@ -24,6 +24,7 @@ spr_alloc:		.res 1
 game_mode:		.res 1
 
 player_dir:		.res 1		; 0 for up-left, 1 for up-right, 2 for down-left, 3 for down-right
+player_disp_dir:	.res 1
 player_anim_num:	.res 1		; Which animation list
 player_anim_addr:	.res 2		; Current animation script pointer
 player_anim_len:	.res 1		; Current animation script length

@@ -175,9 +175,6 @@ main_top_loop:
 	jsr player_render
 	jsr fiends_render
 
-	lda ppumask_config
-	sta PPUMASK
-
 	; End of game logic frame; wait for NMI (vblank) to begin
 	jsr wait_nmi
 
@@ -212,12 +209,6 @@ game_state_init:
 	sta pad_2
 	sta pad_2_prev
 	sta spr_alloc
-
-	lda $5555
-	lda #%10101010
-	sta data_fence
-	lda #%01010101
-	sta data_fence+1
 
 	; Set up main and title screens
 	ldx #<main_comp

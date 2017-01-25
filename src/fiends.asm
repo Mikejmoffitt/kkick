@@ -8,13 +8,13 @@ FIEND_STATE_ATTACKED = 3
 FIEND_STATE_DYING = 4
 FIEND_STATE_DEAD = 5
 
-FIENDS_SPEED_START_HI = 1
-FIENDS_SPEED_START_LO = 0
+FIENDS_SPEED_START_HI = 3
+FIENDS_SPEED_START_LO = 24
 
 FIEND_CENTER = $7F
-FIEND_ATK_RANGE = 26 ; Distance from player when fiend starts attack anim
-FIEND_KICK_RANGE = 22 ; Distance from player when fiend can be kicked
-FIEND_HIT_RANGE = 9 ; DIstance from player where fiend hurts player
+FIEND_ATK_RANGE = 23 ; Distance from player when fiend starts attack anim
+FIEND_KICK_RANGE = 16 ; Distance from player when fiend can be kicked
+FIEND_HIT_RANGE = 13 ; DIstance from player where fiend hurts player
 
 FIEND_LEFT_ATK_BOUND =   (FIEND_CENTER + FIEND_ATK_RANGE)
 FIEND_RIGHT_ATK_BOUND =  (FIEND_CENTER - FIEND_ATK_RANGE)
@@ -325,18 +325,18 @@ fiend_detect_player_coll:
 
 ; Fiend begins an attack animation
 @do_atk_anim:
-	lda ppumask_config
-	ora #%01000001
-	sta PPUMASK
+	;lda ppumask_config
+	;ora #%01000001
+	;sta PPUMASK
 	lda #FIEND_STATE_ATTACKING
 	sta fiend_state, x
 	rts
 
 ; Fiend is close enough to be hurt by the player
 @do_get_kicked:
-	lda ppumask_config
-	ora #%00100001
-	sta PPUMASK
+	;lda ppumask_config
+	;ora #%00100001
+	;sta PPUMASK
 	jsr fiend_eval_get_kicked
 
 	; Facing the player?
@@ -352,9 +352,9 @@ fiend_detect_player_coll:
 
 ; Fiend hurts the player.
 @do_hit_player:
-	lda ppumask_config
-	ora #%10000001
-	sta PPUMASK
+	;lda ppumask_config
+	;ora #%10000001
+	;sta PPUMASK
 	jsr fiend_eval_get_kicked
 ; TODO: Check if fiend has been killed, and abort here if so.
 	lda fiend_state, x
