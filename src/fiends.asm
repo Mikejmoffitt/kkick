@@ -12,11 +12,14 @@ FIENDS_SPEED_START_HI = 1
 FIENDS_SPEED_START_LO = 0
 
 FIEND_CENTER = $7F
-FIEND_ATK_RANGE = 30
-FIEND_HIT_RANGE = 9
+FIEND_ATK_RANGE = 30 ; Distance from player when fiend starts attack anim
+FIEND_KICK_RANGE = 22 ; Distance from player when fiend can be kicked
+FIEND_HIT_RANGE = 9 ; DIstance from player where fiend hurts player
 
 FIEND_LEFT_ATK_BOUND = (FIEND_CENTER + FIEND_ATK_RANGE)
 FIEND_RIGHT_ATK_BOUND = (FIEND_CENTER - FIEND_ATK_RANGE)
+FIEND_LEFT_KICK_BOUND = (FIEND_CENTER + FIEND_KICK_RANGE)
+FIEND_RIGHT_KICK_BOUND = (FIEND_CENTER - FIEND_KICK_RANGE)
 FIEND_LEFT_HIT_BOUND = (FIEND_CENTER + FIEND_HIT_RANGE)
 FIEND_RIGHT_HIT_BOUND = (FIEND_CENTER - FIEND_HIT_RANGE)
 
@@ -111,11 +114,11 @@ fiends_init:
 fiends_logic:
 	ldx #NUM_FIENDS
 :
-	lda fiend_state, x
-	beq @skip_fiend_proc
+		lda fiend_state, x
+		beq @skip_fiend_proc
 
-	jsr fiend_move
-	jsr fiend_detect_player_coll
+		jsr fiend_move
+		jsr fiend_detect_player_coll
 
 @skip_fiend_proc:
 	dex
@@ -126,10 +129,10 @@ fiends_logic:
 fiends_render:
 	ldx #NUM_FIENDS
 :
-	lda fiend_state, x
-	beq @skip_fiend_proc
+		lda fiend_state, x
+		beq @skip_fiend_proc
 
-	jsr fiend_render
+		jsr fiend_render
 @skip_fiend_proc:
 	dex
 	bne :-
@@ -139,17 +142,16 @@ fiends_render:
 fiend_spawn:
 	and #%00000011
 	sta temp
-	lda $5555
 	ldx #NUM_FIENDS
 :
 
-	lda fiend_state, x
-	bne @fiend_ng
-	; Idle fiend found. Initialize the one fiend and get out.
-	lda temp
-	jsr fiend_setup
+		lda fiend_state, x
+		bne @fiend_ng
+		; Idle fiend found. Initialize the one fiend and get out.
+		lda temp
+		jsr fiend_setup
 
-	rts
+		rts
 @fiend_ng:
 	dex
 	bne :-
@@ -288,8 +290,6 @@ fiend_move:
 	lda fiend_ypos_hi, x
 	sbc temp+1
 	sta fiend_ypos_hi, x
-
-	rts
 
 	rts
 
