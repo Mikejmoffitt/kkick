@@ -15,8 +15,10 @@ player_init:
 	stx player_anim_num
 	stx player_kick_cnt
 	stx player_score
+	stx player_score_acc
+	stx player_score_acc+1
 	ldx #03
-	stx player_hp
+	stx player_health
 	stx player_lives
 rts
 

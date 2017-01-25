@@ -6,6 +6,9 @@ DIR_UP_RIGHT   = %00000001
 DIR_DOWN_LEFT  = %00000010
 DIR_DOWN_RIGHT = %00000011
 
+GAME_MODE_A    = 0
+GAME_MODE_B    = 1
+
 .segment "FIXED"
 .include "nes.asm"
 .include "header.asm"
@@ -173,7 +176,6 @@ main_top_loop:
 	jsr fiends_render
 
 	lda ppumask_config
-	ora #%11100000
 	sta PPUMASK
 
 	; End of game logic frame; wait for NMI (vblank) to begin
@@ -182,6 +184,8 @@ main_top_loop:
 	; Commit VRAM updates while PPU is disabled in vblank
 	ppu_disable
 	jsr draw_score
+	jsr draw_lives
+	jsr draw_health
 	spr_dma
 	ppu_load_scroll xscroll, yscroll
 
@@ -191,6 +195,29 @@ main_top_loop:
 	jmp main_top_loop; loop forever
 
 game_state_init:
+
+	lda #$00
+	sta temp
+	sta temp2
+	sta temp3
+	sta temp4
+	sta temp5
+	sta temp6
+	sta temp7
+	sta temp8
+	sta addr_ptr
+	sta addr_ptr+1
+	sta pad_1
+	sta pad_1_prev
+	sta pad_2
+	sta pad_2_prev
+	sta spr_alloc
+
+	lda $5555
+	lda #%10101010
+	sta data_fence
+	lda #%01010101
+	sta data_fence+1
 
 	; Set up main and title screens
 	ldx #<main_comp
@@ -202,6 +229,9 @@ game_state_init:
 	ldy #>title_comp
 	lda #$24
 	jsr unpack_nt
+
+	lda #GAME_MODE_A
+	sta game_mode
 
 	; Load in a palette
 	ppu_load_spr_palette sample_spr_palette_data
@@ -218,8 +248,8 @@ title_comp:
 main_bg_palette:
 	.byte	$0F, $15, $30, $0F
 	.byte	$0F, $17, $27, $38
-	.byte	$0F, $17, $27, $37
-	.byte	$0F, $17, $27, $37
+	.byte	$0F, $2A, $27, $2C
+	.byte	$0F, $36, $30, $01
 
 sample_spr_palette_data:
 	.byte	$0F, $36, $30, $0F

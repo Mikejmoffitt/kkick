@@ -166,11 +166,11 @@ draw_score:
 	rts
 
 
-sc_test:
+score_add_point:
 	inc player_score
 	lda player_score
 	cmp #10
-	bne :+
+	bne @inc_done
 	lda #$00
 	sta player_score
 	lda player_score+1
@@ -178,7 +178,7 @@ sc_test:
 	adc #$01
 	sta player_score+1
 	cmp #10
-	bne :+
+	bne @inc_done
 	lda #$00
 	sta player_score+1
 	lda player_score+2
@@ -186,6 +186,76 @@ sc_test:
 	adc #$01
 	sta player_score+2
 
-:
+@inc_done: ; Done with BCD accumulation
+
+; Increment score accumulator for extra lives
+	lda player_score_acc
+	clc
+	adc #$01
+	sta player_score_acc
+	; mod 200 points?
+	cmp #200
+	beq @award_life
 	rts
 
+; If score accumulator >= 200, give an extra life
+@award_life:
+	lda #$00
+	sta player_score_acc
+	inc player_lives
+	beq @lives_overflow
+	rts
+
+@lives_overflow:
+	lda #$FF
+	sta player_lives
+	rts
+
+; Writes the number of lives as a little number next to the player icon
+draw_lives:
+	bit PPUSTATUS
+	lda #$22
+	sta PPUADDR
+	lda #$E7
+	sta PPUADDR
+
+	lda player_lives
+	clc
+	adc #$F0
+	sta PPUDATA
+	rts
+
+; Draws the health status bar.
+draw_health:
+	bit PPUSTATUS
+	lda #$22
+	sta PPUADDR
+	lda #$F5
+	sta PPUADDR
+
+	ldx #$01
+	lda player_health
+	cmp #1
+	bcs :+
+	ldx #$00
+:
+	stx PPUDATA
+	stx PPUDATA
+	ldx #$01
+	lda player_health
+	cmp #2
+	bcs :+
+	ldx #$00
+:
+	stx PPUDATA
+	stx PPUDATA
+	ldx #$01
+	lda player_health
+	cmp #3
+	bcs :+
+	ldx #$00
+:
+	stx PPUDATA
+	stx PPUDATA
+		
+	rts	

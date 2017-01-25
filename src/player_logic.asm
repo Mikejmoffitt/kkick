@@ -18,6 +18,12 @@ player_counters:
 @post_kcount:
 	rts
 
+player_trigger_kick_anim:
+	jsr player_reset_animation
+	lda #21
+	sta player_kick_cnt
+	rts
+
 player_handle_input:
 	key_isdown pad_1, btn_left
 	lda player_dir
@@ -42,10 +48,13 @@ player_handle_input:
 
 ; Debug kick anim test
 	key_down pad_1, btn_a
-	;jsr player_reset_animation
-	;lda #21
-	;sta player_kick_cnt
+	
+	lda game_mode
+	beq @no_manual_kick
+	jsr player_trigger_kick_anim
+@no_manual_kick:
 	lda player_dir
+	eor #%00000011
 	jsr fiend_spawn
 	;jsr play_whoa_sound
 :

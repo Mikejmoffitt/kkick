@@ -21,6 +21,7 @@ pad_2_prev:		.res 1
 FT_TEMP:		.res 3
 rand_seed:		.res 2
 spr_alloc:		.res 1
+game_mode:		.res 1
 
 player_dir:		.res 1		; 0 for up-left, 1 for up-right, 2 for down-left, 3 for down-right
 player_anim_num:	.res 1		; Which animation list
@@ -32,7 +33,8 @@ player_anim_cnt:	.res 1		; Animation accumulator
 player_kick_cnt:	.res 1		; If nonzero, a kick anim is happening
 
 player_score:		.res 3		; BCD storage of player score
-player_hp:		.res 1
+player_score_acc:	.res 1
+player_health:		.res 1
 player_lives:		.res 1
 
 fiends_gen_cnt:		.res 1		; countdown to spawning a bad dude
@@ -42,6 +44,11 @@ fiend_xpos_hi:		.res (1 * NUM_FIENDS)
 fiend_ypos_hi:		.res (1 * NUM_FIENDS)
 fiend_xpos_lo:		.res (1 * NUM_FIENDS)
 fiend_ypos_lo:		.res (1 * NUM_FIENDS)
+fiend_state:		.res (1 * NUM_FIENDS)
+fiend_death_cnt:	.res (1 * NUM_FIENDS)
+fiend_dir:		.res (1 * NUM_FIENDS)
+
+data_fence:		.res 2
 
 .segment "RAM"
 
@@ -49,22 +56,18 @@ fiend_ypos_lo:		.res (1 * NUM_FIENDS)
 FT_BASE_ADR:		.res 256
 
 ; Flags for PPU control
-ppumask_config:	.res 1
-ppuctrl_config:	.res 1
-vblank_flag:	.res 1
-xscroll:	.res 2
-yscroll:	.res 2
+ppumask_config:		.res 1
+ppuctrl_config:		.res 1
+vblank_flag:		.res 1
+xscroll:		.res 2
+yscroll:		.res 2
 
 button_table:
-btn_a:		.res 1
-btn_b:		.res 1
-btn_sel:	.res 1
-btn_start:	.res 1
-btn_up:		.res 1
-btn_down:	.res 1
-btn_left:	.res 1
-btn_right:	.res 1
-
-fiend_state:		.res (1 * NUM_FIENDS)
-fiend_death_cnt:	.res (1 * NUM_FIENDS)
-fiend_dir:		.res (1 * NUM_FIENDS)
+btn_a:			.res 1
+btn_b:			.res 1
+btn_sel:		.res 1
+btn_start:		.res 1
+btn_up:			.res 1
+btn_down:		.res 1
+btn_left:		.res 1
+btn_right:		.res 1

@@ -12,16 +12,16 @@ FIENDS_SPEED_START_HI = 1
 FIENDS_SPEED_START_LO = 0
 
 FIEND_CENTER = $7F
-FIEND_ATK_RANGE = 30 ; Distance from player when fiend starts attack anim
+FIEND_ATK_RANGE = 26 ; Distance from player when fiend starts attack anim
 FIEND_KICK_RANGE = 22 ; Distance from player when fiend can be kicked
 FIEND_HIT_RANGE = 9 ; DIstance from player where fiend hurts player
 
-FIEND_LEFT_ATK_BOUND = (FIEND_CENTER + FIEND_ATK_RANGE)
-FIEND_RIGHT_ATK_BOUND = (FIEND_CENTER - FIEND_ATK_RANGE)
-FIEND_LEFT_KICK_BOUND = (FIEND_CENTER + FIEND_KICK_RANGE)
+FIEND_LEFT_ATK_BOUND =   (FIEND_CENTER + FIEND_ATK_RANGE)
+FIEND_RIGHT_ATK_BOUND =  (FIEND_CENTER - FIEND_ATK_RANGE)
+FIEND_LEFT_KICK_BOUND =  (FIEND_CENTER + FIEND_KICK_RANGE)
 FIEND_RIGHT_KICK_BOUND = (FIEND_CENTER - FIEND_KICK_RANGE)
-FIEND_LEFT_HIT_BOUND = (FIEND_CENTER + FIEND_HIT_RANGE)
-FIEND_RIGHT_HIT_BOUND = (FIEND_CENTER - FIEND_HIT_RANGE)
+FIEND_LEFT_HIT_BOUND =   (FIEND_CENTER + FIEND_HIT_RANGE)
+FIEND_RIGHT_HIT_BOUND =  (FIEND_CENTER - FIEND_HIT_RANGE)
 
 FIEND_SPAWN_DISTANCE = 80
 FIEND_SPAWN_LEFT = ($7F - FIEND_SPAWN_DISTANCE)
@@ -308,6 +308,8 @@ fiend_detect_player_coll:
 @moving_right:
 	cmp #FIEND_RIGHT_HIT_BOUND
 	bcs @do_hit_player
+	cmp #FIEND_RIGHT_KICK_BOUND
+	bcs @do_get_kicked
 	cmp #FIEND_RIGHT_ATK_BOUND
 	bcs @do_atk_anim
 	rts
@@ -315,10 +317,13 @@ fiend_detect_player_coll:
 @moving_left:
 	cmp #FIEND_LEFT_HIT_BOUND
 	bcc @do_hit_player
+	cmp #FIEND_LEFT_KICK_BOUND
+	bcc @do_get_kicked
 	cmp #FIEND_LEFT_ATK_BOUND
 	bcc @do_atk_anim
 	rts
 
+; Fiend begins an attack animation
 @do_atk_anim:
 	lda ppumask_config
 	ora #%01000001
@@ -327,38 +332,77 @@ fiend_detect_player_coll:
 	sta fiend_state, x
 	rts
 
+; Fiend is close enough to be hurt by the player
+@do_get_kicked:
+	lda ppumask_config
+	ora #%00100001
+	sta PPUMASK
+	jsr fiend_eval_get_kicked
+
+	; Facing the player?
+	lda fiend_dir, x
+	eor #%00000011
+	cmp player_dir
+	beq :+
+	rts
+:
+	; If so, ahve the player begin a kick
+	jsr player_trigger_kick_anim
+	rts
+
+; Fiend hurts the player.
 @do_hit_player:
 	lda ppumask_config
-	ora #%10100001
+	ora #%10000001
 	sta PPUMASK
+	jsr fiend_eval_get_kicked
+; TODO: Check if fiend has been killed, and abort here if so.
 	lda fiend_state, x
 	cmp #FIEND_STATE_ATTACKED
 	bne @has_not_attacked
+	jsr fiend_die
 	rts
 
 @has_not_attacked:
 	lda #FIEND_STATE_ATTACKED
 	sta fiend_state, x
-	; Now check if:
-	; 1) the player is facing the correct direction, and that
-	; 2) the player is doing a kick (kc > 0 && kc < thresh)
-	lda player_dir
-	eor #%00000011
-	cmp fiend_dir, x
-	bne @do_hurt_player
-
-	; Player passed test #1. Now check kick counter
-	lda player_kick_cnt
-	beq @do_hurt_player
-	cmp #KICK_THRESH
-	bcs @do_hurt_player
-
-	; Player passed all tests. Fiend is destroyed if the player hasn't already
-	; done so.
-	lda #FIEND_STATE_DYING
+; TODO: Inflict damage here - play sound, hurt anim, etc.
+	; The fiend just disappears at this point.
+	lda #FIEND_STATE_IDLE
 	sta fiend_state, x
 
-@do_hurt_player:
-; TODO: Hurt the player.
+	dec player_health
+
+	rts
+
+fiend_eval_get_kicked:
+; Mode A: Player is facing the fiend
+@mode_a:
+	lda fiend_dir, x
+	eor #%00000011
+	cmp player_dir
+	beq @is_facing_player
+	rts
+
+@is_facing_player:
+; Mode B: Player must also be kicking at the right time manually
+	lda game_mode
+	beq fiend_die
+	rts
+@mode_b:
+	; Check that kick_cnt != 0 && kick_cnt <= KICK_THRESH
+	lda player_kick_cnt
+	beq :+
+	cmp #KICK_THRESH
+	bcc fiend_die
+:
+	rts
+
+; Kill off the dude
+fiend_die:
+; TODO: Initialize dying animation instead of just voiping away.
+	lda #FIEND_STATE_IDLE
+	sta fiend_state, x
+	jsr score_add_point
 
 	rts
