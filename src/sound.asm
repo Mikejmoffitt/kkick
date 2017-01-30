@@ -39,6 +39,17 @@ play_whoa_sound:
 	sta $4015
 	rts
 
+play_oof_sound:
+	lda #%00001111
+	sta $4010
+	lda #$F6
+	sta $4012
+	lda #$27
+	sta $4013
+	lda #%00011111
+	sta $4015
+	rts
+
 waste_time:
 	rol
 	ror

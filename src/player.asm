@@ -7,6 +7,9 @@ ANIM_KICK_FWD = 3
 ANIM_KICK_BACK = 4
 MAX_PL_SPRITES = (16*4)
 
+PLAYER_KICK_LEN = 21
+PLAYER_COOLDOWN_LEN = 8
+
 .segment "FIXED"
 
 player_init:
@@ -15,8 +18,10 @@ player_init:
 	stx player_anim_num
 	stx player_kick_cnt
 	stx player_score
+	stx player_score+1
+	stx player_score+2
 	stx player_score_acc
-	stx player_score_acc+1
+	stx player_cooldown
 	ldx #03
 	stx player_health
 	stx player_lives

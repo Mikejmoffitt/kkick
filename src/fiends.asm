@@ -8,13 +8,13 @@ FIEND_STATE_ATTACKED = 3
 FIEND_STATE_DYING = 4
 FIEND_STATE_DEAD = 5
 
-FIENDS_SPEED_START_HI = 3
+FIENDS_SPEED_START_HI = 1
 FIENDS_SPEED_START_LO = 24
 
 FIEND_CENTER = $7F
 FIEND_ATK_RANGE = 23 ; Distance from player when fiend starts attack anim
-FIEND_KICK_RANGE = 16 ; Distance from player when fiend can be kicked
-FIEND_HIT_RANGE = 13 ; DIstance from player where fiend hurts player
+FIEND_KICK_RANGE = 18 ; Distance from player when fiend can be kicked
+FIEND_HIT_RANGE = 6 ; DIstance from player where fiend hurts player
 
 FIEND_LEFT_ATK_BOUND =   (FIEND_CENTER + FIEND_ATK_RANGE)
 FIEND_RIGHT_ATK_BOUND =  (FIEND_CENTER - FIEND_ATK_RANGE)
@@ -89,13 +89,10 @@ fiends_init:
 	lda #FIENDS_SPEED_START_LO
 	sta fiends_speed
 
-	ldy #$00
 	lda #$00
-	sty fiends_gen_cnt
-
-	dey
+	sta fiends_gen_disable
+	sta fiends_gen_cnt
 	ldx #NUM_FIENDS
-	lda #$00
 :
 		sta fiend_xpos_lo, x
 		sta fiend_xpos_hi, x
@@ -112,6 +109,10 @@ fiends_init:
 
 ; Game logic top-level
 fiends_logic:
+
+	jsr fiends_gen_proc
+
+
 	ldx #NUM_FIENDS
 :
 		lda fiend_state, x
@@ -123,6 +124,17 @@ fiends_logic:
 @skip_fiend_proc:
 	dex
 	bne :-
+	rts
+
+; Responsible for fiend spawning.
+fiends_gen_proc:
+	ldx fiends_gen_disable
+	beq :+
+	dex
+	stx fiends_gen_disable
+	rts
+:
+; TODO: Periodic spawning based on fiends_gen
 	rts
 
 ; Render top-level
@@ -293,6 +305,8 @@ fiend_move:
 
 	rts
 
+
+
 ; Detect if fiend X is near the player, and transition to the attack state or
 ; damage the player if the player is not kicking and facing them
 fiend_detect_player_coll:
@@ -337,6 +351,10 @@ fiend_detect_player_coll:
 	;lda ppumask_config
 	;ora #%00100001
 	;sta PPUMASK
+	lda player_cooldown
+	beq :+
+	rts
+:
 	jsr fiend_eval_get_kicked
 
 	; Facing the player?
@@ -346,8 +364,8 @@ fiend_detect_player_coll:
 	beq :+
 	rts
 :
-	; If so, ahve the player begin a kick
-	jsr player_trigger_kick_anim
+	; If so, have the player begin a kick
+	jsr player_do_kick
 	rts
 
 ; Fiend hurts the player.
@@ -355,8 +373,7 @@ fiend_detect_player_coll:
 	;lda ppumask_config
 	;ora #%10000001
 	;sta PPUMASK
-	jsr fiend_eval_get_kicked
-; TODO: Check if fiend has been killed, and abort here if so.
+; TODO: Maybe ensure that the guy is not dead here?
 	lda fiend_state, x
 	cmp #FIEND_STATE_ATTACKED
 	bne @has_not_attacked
@@ -371,9 +388,11 @@ fiend_detect_player_coll:
 	lda #FIEND_STATE_IDLE
 	sta fiend_state, x
 
-	dec player_health
+	jsr player_get_hurt
 
 	rts
+
+
 
 fiend_eval_get_kicked:
 ; Mode A: Player is facing the fiend

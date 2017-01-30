@@ -32,12 +32,14 @@ player_anim_frame:	.res 1		; Frame index into animation script
 player_anim_cnt:	.res 1		; Animation accumulator
 
 player_kick_cnt:	.res 1		; If nonzero, a kick anim is happening
+player_cooldown:	.res 1
 
 player_score:		.res 3		; BCD storage of player score
 player_score_acc:	.res 1
 player_health:		.res 1
 player_lives:		.res 1
 
+fiends_gen_disable:	.res 1		; When nonzero, counts down and prevents enemy spawns
 fiends_gen_cnt:		.res 1		; countdown to spawning a bad dude
 fiends_speed:		.res 2		; 8.8 dx and (dy*2) for approaching
 
