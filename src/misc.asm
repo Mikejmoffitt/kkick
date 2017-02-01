@@ -107,11 +107,13 @@ misc_render:
 ; ============================================================================
 ; Show "Game Over" for three seconds
 misc_gameover:
+	lda #$02
+	jsr play_track
 	jsr spr_init
 	jsr wait_nmi
 	ppu_disable
 	spr_dma
-	ldx #130
+	ldx #$FF
 @wait_top:
 	jsr read_joy_safe
 	txa
@@ -126,6 +128,8 @@ misc_gameover:
 	ldx #$80
 	ldy #$78
 	jsr draw_metasprite
+
+	jsr FamiToneUpdate
 	
 	jsr wait_nmi
 	ppu_disable
@@ -137,6 +141,19 @@ misc_gameover:
 	tax
 	dex
 	bne @wait_top
+
+	ldx #80
+@blank_wait:
+	txa
+	pha
+	jsr FamiToneUpdate
+
+	jsr wait_nmi
+
+	pla
+	tax
+	dex
+	bne @blank_wait
 
 	rts
 

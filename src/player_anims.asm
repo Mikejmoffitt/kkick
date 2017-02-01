@@ -366,8 +366,8 @@ pl_anim_hurt:
 	.byte	5, 0
 
 pl_anim_death:
-	.byte	22
-	.byte	20
+	.byte	18
+	.byte	16
 	.addr	pl_mapping_hurt_shift
 	.byte	12, 0
 	.addr	pl_mapping_hurt

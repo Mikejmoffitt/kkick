@@ -831,6 +831,7 @@ fiend_detect_player_coll:
 :
 	; If so, have the player begin a kick
 	jsr player_do_kick
+	jsr play_hit_sound
 	rts
 
 ; Fiend hurts the player.

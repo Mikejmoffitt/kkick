@@ -48,6 +48,22 @@ play_oof_sound:
 	sta $4015
 	rts
 
+play_hit_sound:
+	lda #%00001100
+	sta temp
+	lda rand_seed
+	and #%00000011
+	clc
+	adc temp
+	sta $4010
+	lda #$EC
+	sta $4012
+	lda #$20
+	sta $4013
+	lda #%00011111
+	sta $4015
+	rts
+
 waste_time:
 	rol
 	ror
