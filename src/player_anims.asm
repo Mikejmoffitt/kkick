@@ -225,8 +225,53 @@ pl_mapping_kick_back6:
 	.byte	<-7, $44, %00000000, <-4
 	.byte	MAP_END
 
+pl_mapping_hurt:
+	.byte	<-31, $C0, %00000000, <-20
+	.byte	<-31, $42, %00000000, <-12
+	.byte	<-31, $43, %00000000, <-4
+	.byte	<-23, $D0, %00000000, <-20
+	.byte	<-23, $C1, %00000000, <-12
+	.byte	<-23, $C2, %00000000, <-4
+	.byte	<-15, $D1, %00000000, <-12
+	.byte	<-15, $D2, %00000000, <-4
+	.byte	<-15, $D3, %00000000, 4
+	.byte	<-7,  $E1, %00000000, <-12
+	.byte	<-7,  $E2, %00000000, <-4
+	.byte	MAP_END
+
+pl_mapping_hurt_shift:
+	.byte	<-31, $C0, %00000000, <-19
+	.byte	<-31, $42, %00000000, <-11
+	.byte	<-31, $43, %00000000, <-3
+	.byte	<-23, $D0, %00000000, <-19
+	.byte	<-23, $C1, %00000000, <-11
+	.byte	<-23, $C2, %00000000, <-3
+	.byte	<-15, $D1, %00000000, <-11
+	.byte	<-15, $D2, %00000000, <-3
+	.byte	<-15, $D3, %00000000, 5
+	.byte	<-7,  $E1, %00000000, <-11
+	.byte	<-7,  $E2, %00000000, <-3
+	.byte	MAP_END
+
+pl_mapping_kick_fwd1_shift:
+	.byte	<-31, $40, %00000000, <-13
+	.byte	<-31, $41, %00000000, <-5
+	.byte	<-23, $50, %00000000, <-9
+	.byte	<-23, $51, %00000000, <-1
+	.byte	<-15, $60, %00000000, <-9
+	.byte	<-15, $61, %00000000, <-1
+	.byte	<-7, $65, %00000000, <-5
+	.byte	MAP_END
+
+pl_mapping_death:
+	.byte	<-8,  $F0, %00000000, <-19
+	.byte	<-8,  $F1, %00000000, <-11
+	.byte	<-8,  $F2, %00000000, <-3
+	.byte	<-8,  $F3, %00000000, 5
+	.byte	<-16, $E3, %00000000, 5
+	.byte	MAP_END
+
 pl_mapping_dummy:
-	.byte	<-$20, <-$20, 0, 0
 	.byte	MAP_END
 
 
@@ -314,6 +359,52 @@ pl_anim_kick_back:
 	.addr	pl_mapping_kick_back2_ex
 	.byte	1, 0
 
+pl_anim_hurt:
+	.byte	1
+	.byte	0
+	.addr	pl_mapping_hurt
+	.byte	5, 0
+
+pl_anim_death:
+	.byte	22
+	.byte	20
+	.addr	pl_mapping_hurt_shift
+	.byte	12, 0
+	.addr	pl_mapping_hurt
+	.byte	5, 0
+	.addr	pl_mapping_hurt_shift
+	.byte	5, 0
+	.addr	pl_mapping_hurt
+	.byte	4, 0
+	.addr	pl_mapping_hurt_shift
+	.byte	4, 0
+	.addr	pl_mapping_hurt
+	.byte	4, 0
+	.addr	pl_mapping_hurt_shift
+	.byte	4, 0
+	.addr	pl_mapping_hurt
+	.byte	3, 0
+	.addr	pl_mapping_kick_fwd1
+	.byte	11, 0
+	.addr	pl_mapping_death
+	.byte	38, 0
+	.addr	pl_mapping_dummy
+	.byte	10, 0
+	.addr	pl_mapping_death
+	.byte	10, 0
+	.addr	pl_mapping_dummy
+	.byte	10, 0
+	.addr	pl_mapping_death
+	.byte	10, 0
+	.addr	pl_mapping_dummy
+	.byte	10, 0
+	.addr	pl_mapping_death
+	.byte	10, 0
+	.addr	pl_mapping_dummy
+	.byte	1, 0
+	.addr	pl_mapping_death
+	.byte	1, 0
+
 ; ============ Animation Number Map ====================
 ; An array containing the addresses of animation numbers. Used to
 ; number to an animation script.
@@ -323,3 +414,5 @@ pl_anim_num_map:
 	.addr	pl_anim_stand_back
 	.addr	pl_anim_kick_fwd
 	.addr	pl_anim_kick_back
+	.addr	pl_anim_hurt
+	.addr	pl_anim_death

@@ -8,13 +8,15 @@ FIEND_STATE_ATTACKED = 3
 FIEND_STATE_DYING = 4
 FIEND_STATE_DEAD = 5
 
-FIENDS_SPEED_START_HI = 1
-FIENDS_SPEED_START_LO = 24
+FIENDS_SPEED_START_HI = 0
+FIENDS_SPEED_START_LO = 128
+
+FIENDS_SPEED_MAX_HI = 7
 
 FIEND_CENTER = $7F
-FIEND_ATK_RANGE = 23 ; Distance from player when fiend starts attack anim
-FIEND_KICK_RANGE = 18 ; Distance from player when fiend can be kicked
-FIEND_HIT_RANGE = 6 ; DIstance from player where fiend hurts player
+FIEND_ATK_RANGE = 29 ; Distance from player when fiend starts attack anim
+FIEND_KICK_RANGE = 23 ; Distance from player when fiend can be kicked
+FIEND_HIT_RANGE = 9 ; DIstance from player where fiend hurts player
 
 FIEND_LEFT_ATK_BOUND =   (FIEND_CENTER + FIEND_ATK_RANGE)
 FIEND_RIGHT_ATK_BOUND =  (FIEND_CENTER - FIEND_ATK_RANGE)
@@ -23,13 +25,222 @@ FIEND_RIGHT_KICK_BOUND = (FIEND_CENTER - FIEND_KICK_RANGE)
 FIEND_LEFT_HIT_BOUND =   (FIEND_CENTER + FIEND_HIT_RANGE)
 FIEND_RIGHT_HIT_BOUND =  (FIEND_CENTER - FIEND_HIT_RANGE)
 
+FIENDS_GEN_PERIOD_DEFAULT = 40
+FIENDS_GEN_PERIOD_MIN = 10
+
 FIEND_SPAWN_DISTANCE = 80
 FIEND_SPAWN_LEFT = ($7F - FIEND_SPAWN_DISTANCE)
 FIEND_SPAWN_RIGHT = ($7F + FIEND_SPAWN_DISTANCE)
 FIEND_SPAWN_TOP = ($70 - FIEND_SPAWN_DISTANCE/2)
 FIEND_SPAWN_BOTTOM = ($70 + FIEND_SPAWN_DISTANCE/2)
 
+FIEND_ANIM_PERIOD = 4
+FIEND_ANIM_LEN = 6
+
 KICK_THRESH = 10
+
+STAT_TABLE_ACC_PERIOD = 6
+
+TABLE_END = $FFFF
+
+; Format is speed_lo, speed_hi, spawn period.
+fiends_stat_table:
+	.word	$0100
+	.byte	40
+	;------------
+	.word	$010B
+	.byte	38
+	;------------
+	.word	$0117
+	.byte	36
+	;------------
+	.word	$011F
+	.byte	35
+	;------------
+	.word	$0124
+	.byte	34
+	;------------
+	.word	$012E
+	.byte	34
+	;------------
+	.word	$0131
+	.byte	32
+	;------------
+	.word	$0135
+	.byte	31
+	;------------
+	.word	$0138
+	.byte	30
+	;------------
+	.word	$013B
+	.byte	29
+	;------------
+	.word	$0140
+	.byte	27
+	;------------
+	.word	$0143
+	.byte	26
+	;------------
+	.word	$013F
+	.byte	29
+	;------------
+	.word	$0146
+	.byte	27
+	;------------
+	.word	$014A
+	.byte	26
+	;------------
+	.word	$014D
+	.byte	25
+	;------------
+	.word	$0150
+	.byte	25
+	;------------
+	.word	$0159
+	.byte	25
+	;------------
+	.word	$0160
+	.byte	24
+	;------------
+	.word	$016E
+	.byte	24
+	;------------
+	.word	$016F
+	.byte	23
+	;------------
+	.word	$0170
+	.byte	23
+	;------------
+	.word	$0176
+	.byte	22
+	;------------
+	.word	$018E
+	.byte	22
+	;------------
+	.word	$0195
+	.byte	21
+	;------------
+	.word	$01AF
+	.byte	21
+	;------------
+	.word	$01C3
+	.byte	21
+	;------------
+	.word	$01E0
+	.byte	20
+	;------------
+	.word	$0200
+	.byte	20
+	;------------
+	.word	$0210
+	.byte	19
+	;------------
+	.word	$021D
+	.byte	18
+	;------------
+	.word	$0220
+	.byte	17
+	;------------
+	.word	$0222
+	.byte	16
+	;------------
+	.word	$0223
+	.byte	15
+	;------------
+	.word	$0210
+	.byte	14
+	;------------
+	.word	$020F
+	.byte	14
+	;------------
+	.word	$0200
+	.byte	15
+	;------------
+	.word	$0200
+	.byte	16
+	;------------
+	.word	$0200
+	.byte	15
+	;------------
+	.word	$020F
+	.byte	14
+	;------------
+	.word	$0240
+	.byte	13
+	;------------
+	.word	$0240
+	.byte	12
+	;------------
+	.word	$0240
+	.byte	13
+	;------------
+	.word	$0200
+	.byte	15
+	;------------
+	.word	$0250
+	.byte	13
+	;------------
+	.word	$0270
+	.byte	12
+	;------------
+	.word	$0283
+	.byte	12
+	;------------
+	.word	$02A3
+	.byte	11
+	;------------
+	.word	$0270
+	.byte	12
+	;------------
+	.word	$0200
+	.byte	15
+	;------------
+	.word	$0223
+	.byte	16
+	;------------
+	.word	$0220
+	.byte	17
+	;------------
+	.word	$0200
+	.byte	16
+	;------------
+	.word	$020F
+	.byte	14
+	;------------
+	.word	$0270
+	.byte	12
+	;------------
+	.word	$0283
+	.byte	11
+	;------------
+	.word	$029F
+	.byte	14
+	;------------
+	.word	$02BF
+	.byte	16
+	;------------
+	.word	$02CF
+	.byte	18
+	;------------
+	.word	$0283
+	.byte	19
+	;------------
+	.word	$0263
+	.byte	19
+	;------------
+	.word	$02AF
+	.byte	14
+	;------------
+	.word	$02D4
+	.byte	12
+	;------------
+	.word	$0300
+	.byte	11
+	;------------
+	.word	$0300
+	.byte	10
+	;------------
+	.word	TABLE_END
 
 ; Metasprite definitions
 fiend_walk_fwd1:
@@ -64,6 +275,23 @@ fiend_walk_fwd4:
 	.byte	<-8,  $8F, %00000000, 0
 	.byte	MAP_END
 
+fiend_walk_back1:
+	.byte	<-28, $5A, %00000000, <-4
+	.byte	<-20, $98, %00000000, <-8
+	.byte	<-20, $99, %00000000, 0
+	.byte	<-12, $A8, %00000000, <-8
+	.byte	<-12, $A9, %00000000, 0
+	.byte	MAP_END
+
+fiend_walk_back2:
+	.byte	<-28, $5A, %00000000, <-4
+	.byte	<-24, $9A, %00000000, <-6
+	.byte	<-16, $AA, %00000000, <-8
+	.byte	<-16, $AB, %00000000, 0
+	.byte	<-8, $BA, %00000000, <-8
+	.byte	<-8, $BB, %00000000, 0
+	.byte	MAP_END
+
 fiend_walk_back3:
 	.byte	<-32, $58, %00000000, <-3
 	.byte	<-24, $9C, %00000000, <-4
@@ -79,39 +307,98 @@ fiend_walk_back4:
 	.byte	<-8,  $BF, %00000000, 0
 	.byte	MAP_END
 
+fiend_anim_fwd:
+	.addr fiend_walk_fwd1
+	.addr fiend_walk_fwd2
+	.addr fiend_walk_fwd3
+	.addr fiend_walk_fwd4
+	.addr fiend_walk_fwd3
+	.addr fiend_walk_fwd2
+
+fiend_anim_back:
+	.addr fiend_walk_back1
+	.addr fiend_walk_back2
+	.addr fiend_walk_back3
+	.addr fiend_walk_back4
+	.addr fiend_walk_back3
+	.addr fiend_walk_back2
 
 ; ----- Exported fiend functions -----
+; ============================================================================
 ; Clear out state for fiends
 fiends_init:
+	ldy #$00
+	ldx #$00
+	lda #<fiends_stat_table
+	sta addr_ptr
+	lda #>fiends_stat_table
+	sta addr_ptr+1
 
-	lda #FIENDS_SPEED_START_HI
-	sta fiends_speed+1
-	lda #FIENDS_SPEED_START_LO
+; Set defaults for speed, etc.
+	ldy #$00
+	lda (addr_ptr), y
 	sta fiends_speed
+	iny
+	lda (addr_ptr), y
+	sta fiends_speed+1
+	iny
+	lda (addr_ptr), y
+	sta fiends_gen_period
 
+; Now calculate the length of the stats table
+	ldx #$00
+@len_calc_top:
+	lda (addr_ptr), y
+	cmp #$FF
+	bne :+
+	iny
+	lda (addr_ptr), y
+	cmp #$FF
+	beq @found_len
+:
+	inx
+	ldy #$00
+	add16 addr_ptr, #3
+	clc
+	bcc @len_calc_top
+
+@found_len:
+	dex
+	stx fiends_stat_table_len
+
+; Clear out some other basic defaults
 	lda #$00
-	sta fiends_gen_disable
 	sta fiends_gen_cnt
+	sta fiends_gen_disable
+	sta fiends_stat_table_idx
+	sta fiends_stat_idx_acc
+	jsr fiends_clear
+	rts
+
+; ============================================================================
+; Get all fiends inactive and off the playfield
+fiends_clear:
 	ldx #NUM_FIENDS
+	lda #$00
 :
 		sta fiend_xpos_lo, x
 		sta fiend_xpos_hi, x
-		sty fiend_ypos_lo, x
-		sty fiend_ypos_hi, x
+		sta fiend_ypos_lo, x
+		sta fiend_ypos_hi, x
 		sta fiend_state, x
 		sta fiend_death_cnt, x
 		sta fiend_dir, x
-		sta fiend_state, x
-	dex
+		sta fiend_anim_frame, x
+		sta fiend_anim_delay, x
+		dex
 	bne :-
-
 	rts
 
+; ============================================================================
 ; Game logic top-level
 fiends_logic:
 
 	jsr fiends_gen_proc
-
 
 	ldx #NUM_FIENDS
 :
@@ -126,30 +413,132 @@ fiends_logic:
 	bne :-
 	rts
 
+; ============================================================================
 ; Responsible for fiend spawning.
 fiends_gen_proc:
+; Check if spawning has been suspended.
 	ldx fiends_gen_disable
 	beq :+
 	dex
 	stx fiends_gen_disable
 	rts
 :
-; TODO: Periodic spawning based on fiends_gen
-	rts
 
-; Render top-level
-fiends_render:
-	ldx #NUM_FIENDS
+; If the game is starting, or the player is dead, disable spawning
+	lda game_start_counter
+	ora player_death_cnt
+	beq :+
+	lda #2
+	sta fiends_gen_disable
+	rts
 :
-		lda fiend_state, x
-		beq @skip_fiend_proc
 
-		jsr fiend_render
-@skip_fiend_proc:
+; Countdown until it's time to spawn another enemy.
+	ldx fiends_gen_cnt
+	beq :+
 	dex
-	bne :-
+	stx fiends_gen_cnt
+	rts
+:
+
+	; Reset the spawn time counter
+	lda fiends_gen_period
+	sta fiends_gen_cnt
+
+; Generate a random number
+	ldx #$08
+	lda rand_seed
+:
+	asl
+	rol rand_seed+1
+	bcc :+
+	eor #$2D
+:
+	dex
+	bne :--
+	sta rand_seed
+
+
+; If the number is between 0 and 20, the fiend doesn't spawn.
+	cmp #20
+	bcs @not_null_spawn
+	rts
+@not_null_spawn:
+	cmp #54
+	bcc @spawn_topleft
+	cmp #112
+	bcc @spawn_topright
+	cmp #173
+	bcc @spawn_bottomleft
+@spawn_bottomright:
+	lda #$03
+	jmp fiend_spawn
+@spawn_topleft:
+	lda #$00
+	jmp fiend_spawn
+@spawn_topright:
+	lda #$01
+	jmp fiend_spawn
+@spawn_bottomleft:
+	lda #$02
+	jmp fiend_spawn
+@no_spawn:
 	rts
 
+; ============================================================================
+; Based on player progress, speeds up the game.
+fiends_speed_inc_proc:
+
+; Determine and accumulate stat table index if appropriate
+	ldy fiends_stat_idx_acc
+	iny
+	sty fiends_stat_idx_acc
+
+	; Should we increment the index?
+	cpy #STAT_TABLE_ACC_PERIOD
+	bne @load_stats ; If not, skip and load stats.
+	lda $5555
+
+	; Increment stat table index
+	ldy fiends_stat_table_idx
+	iny
+	cpy fiends_stat_table_len
+	beq :+
+	sty fiends_stat_table_idx
+:
+	; Clear out stat table accumulator
+	ldy #$00
+	sty fiends_stat_idx_acc
+
+@load_stats:
+
+; Load stats from table index
+	lda #<fiends_stat_table
+	sta addr_ptr
+	lda #>fiends_stat_table
+	sta addr_ptr+1
+
+	; Add 3x the offset to the address pointer
+	add16 addr_ptr, fiends_stat_table_idx
+	add16 addr_ptr, fiends_stat_table_idx
+	add16 addr_ptr, fiends_stat_table_idx
+
+; Get speed low byte
+	ldy #$00
+	lda (addr_ptr), y
+	sta fiends_speed
+; And high byte
+	iny
+	lda (addr_ptr), y
+	sta fiends_speed+1
+; Get spawn counter period
+	iny
+	lda (addr_ptr), y
+	sta fiends_gen_period
+
+	rts
+
+; ============================================================================
 ; Spawn fiend in direction specified in A
 fiend_spawn:
 	and #%00000011
@@ -162,6 +551,7 @@ fiend_spawn:
 		; Idle fiend found. Initialize the one fiend and get out.
 		lda temp
 		jsr fiend_setup
+		jsr fiends_speed_inc_proc
 
 		rts
 @fiend_ng:
@@ -169,9 +559,33 @@ fiend_spawn:
 	bne :-
 	rts
 
+; ============================================================================
+; Render top-level
+fiends_render:
+	ldx #NUM_FIENDS
+:
+		lda fiend_state, x
+		beq @skip_fiend_proc
 
-; ======= Per-fiend internal functions - specific fiend specified in X
+		jsr fiend_animate
+		jsr fiend_draw
+@skip_fiend_proc:
+	dex
+	bne :-
+	rts
 
+; ============================================================================
+; ============================================================================
+; ============================================================================
+; ============================================================================
+;
+;       Per-fiend internal functions - specific fiend specified in X
+;
+; ============================================================================
+; ============================================================================
+; ============================================================================
+
+; ============================================================================
 ; Initializes the fiend in X, and spawns in direction in A
 fiend_setup:
 	sta fiend_dir, x
@@ -207,8 +621,65 @@ fiend_setup:
 	sta fiend_ypos_hi, x
 	rts
 
+; ============================================================================
+; Processes animation sequence for a fiend
+fiend_animate:
+	lda fiend_anim_delay, x
+	beq @next_frame
+	sec
+	sbc #$01
+	sta fiend_anim_delay, x
+	rts
+
+@next_frame:
+	lda #FIEND_ANIM_PERIOD
+	sta fiend_anim_delay, x
+	lda fiend_anim_frame, x
+	clc
+	adc #$01
+	cmp #(FIEND_ANIM_LEN-1)
+	bne @no_phase_reset
+	lda #$00
+
+@no_phase_reset:
+	sta fiend_anim_frame, x
+	rts
+
+; ============================================================================
 ; Renders fiend X based on state
-fiend_render:
+fiend_draw:
+
+; Determine whether fiend is going forwards or backwards
+	lda fiend_dir, x
+	and #%00000010
+	beq @facing_back
+
+; Get animation script
+	lda #<fiend_anim_fwd
+	sta temp
+	lda #>fiend_anim_fwd
+	sta temp+1
+	jmp @choose_frame
+
+@facing_back:
+	lda #<fiend_anim_back
+	sta temp
+	lda #>fiend_anim_back
+	sta temp+1
+	; Fall through to @choose_frame
+
+; Frame offset within struct
+@choose_frame:
+	lda fiend_anim_frame, x
+	asl
+	tay
+	
+; Fetch address of animation frame
+	lda (temp), y
+	sta addr_ptr
+	iny
+	lda (temp), y
+	sta addr_ptr+1
 
 ; Get coordinates, stick in A and Y
 	ldy fiend_ypos_hi, x
@@ -227,13 +698,7 @@ fiend_render:
 	eor #$01
 	sta temp3
 
-	; Choose starting sprite num
-
 	; Get frame address
-	lda #<fiend_walk_fwd2
-	sta addr_ptr
-	lda #>fiend_walk_fwd2
-	sta addr_ptr+1
 	ldx temp
 	lda #$00
 	jsr draw_metasprite
@@ -243,6 +708,7 @@ fiend_render:
 	tax
 	rts
 
+; ============================================================================
 ; Runs the movement logic for fiend X
 fiend_move:
 	; Get fiends_speed / 2 in temp
@@ -305,8 +771,7 @@ fiend_move:
 
 	rts
 
-
-
+; ============================================================================
 ; Detect if fiend X is near the player, and transition to the attack state or
 ; damage the player if the player is not kicking and facing them
 fiend_detect_player_coll:
@@ -392,8 +857,7 @@ fiend_detect_player_coll:
 
 	rts
 
-
-
+; ============================================================================
 fiend_eval_get_kicked:
 ; Mode A: Player is facing the fiend
 @mode_a:

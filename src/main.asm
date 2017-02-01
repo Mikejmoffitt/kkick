@@ -9,6 +9,8 @@ DIR_DOWN_RIGHT = %00000011
 GAME_MODE_A    = 0
 GAME_MODE_B    = 1
 
+GAME_START_DELAY = 110
+
 .segment "FIXED"
 .include "nes.asm"
 .include "header.asm"
@@ -22,6 +24,7 @@ GAME_MODE_B    = 1
 .include "score.asm"
 .include "player.asm"
 .include "fiends.asm"
+.include "misc.asm"
 
 .segment "FIXED"
 ; =============================
@@ -82,6 +85,7 @@ reset_vector:
 
 ; Wait for the PPU to go stable
 	txa				; X still = 0; clear A with this
+	lda $55
 @clrmem:
 	sta $000, x
 	sta $100, x
@@ -124,26 +128,6 @@ reset_vector:
 	stx ppumask_config
 	stx PPUMASK
 
-	jsr spr_init
-
-	ppu_enable
-
-; Build button comparison table
-	lda #$80
-	ldx #$00
-@build_controller_table:
-	sta button_table, x
-	inx
-	lsr
-	bne @build_controller_table
-
-; Set a default for scroll
-	lda #$00
-	sta xscroll
-	sta yscroll+1
-	sta xscroll+1
-	lda #$E0
-	sta yscroll
 	jmp main_entry ; GOTO main loop
 
 ; =============================================================================
@@ -152,28 +136,97 @@ reset_vector:
 ; ====                                                                     ====
 ; =============================================================================
 main_entry:
-; Sound test
-	;lda #$00
-	;jsr play_track
+	jsr misc_init
+	jsr spr_init
+	jsr sound_init
+
+title_screen:
+
+	jsr wait_nmi
 
 	ppu_disable
-	jsr game_state_init
+	ldx #<title_comp
+	ldy #>title_comp
+	lda #$20
+	jsr unpack_nt
 
-	; Bring the PPU back up.
-	jsr wait_nmi
-	ppu_load_scroll xscroll, yscroll
+	; Get palette in there
+	ppu_load_bg_palette main_bg_palette
 
+	lda #$01
+	jsr play_track
+
+	lda #$00
+	sta temp8
 	ppu_enable
 
-main_top_loop:
+
+
+@title_screen_top_loop:
+
+	; Logic
+	jsr FamiToneUpdate
+	lda temp8
+	beq :+
+	jmp start_game
+:
+
+
+
+	jsr wait_nmi_srand
+
+	; Vblank
+	ppu_disable
+	
+	spr_dma
+	ppu_load_scroll xscroll, yscroll
+	ppu_enable
+	jmp @title_screen_top_loop
+
+
+
+
+
+start_game:
+	ppu_disable
+	; Load in a palette
+	ppu_load_spr_palette sample_spr_palette_data
+	ppu_load_bg_palette main_bg_palette
+	; Bring the PPU back up.
+
+	jsr stop_track
+
+; wait a bunch of frames
+	ldx #18
+:
+	jsr wait_nmi
+	dex
+	bne :-
+	ppu_load_scroll xscroll, yscroll
+
+	lda #$00
+	jsr play_track
+	jsr game_state_init
+
+	lda #$00
+	sta PPUMASK
+	ppu_enable
+	jsr read_joy_safe
+	jsr player_reset_animation
+	jsr read_joy_safe
+
+@main_top_loop:
 
 	; Run game logic here
 	jsr read_joy_safe
 	jsr FamiToneUpdate
 	jsr fiends_logic
 	jsr player_logic
+	jsr misc_logic
 	jsr player_render
 	jsr fiends_render
+	jsr misc_render
+
 
 	; End of game logic frame; wait for NMI (vblank) to begin
 	jsr wait_nmi
@@ -183,32 +236,36 @@ main_top_loop:
 	jsr draw_score
 	jsr draw_lives
 	jsr draw_health
-	spr_dma
 	ppu_load_scroll xscroll, yscroll
+	spr_dma
 
-	; Re-enable PPU for the start of a new frame
+; If paused, apply a small effect
+	lda paused
+	beq :+
+
+; Tint the screen for a pause effect
+	lda ppumask_config
+	ora #%11100000
+	sta PPUMASK
+:
 	ppu_enable
 
-	jmp main_top_loop; loop forever
+	; Check for game over conditions, get out if so
 
+	lda player_lives
+	bne :+
+; TODO: Gameover thing
+	jsr misc_gameover
+	ppu_disable
+	jsr spr_init
+	jmp main_entry
+:
+
+	jmp @main_top_loop; loop forever
+
+
+; Clears out data structures to prepare for a fresh game.
 game_state_init:
-
-	lda #$00
-	sta temp
-	sta temp2
-	sta temp3
-	sta temp4
-	sta temp5
-	sta temp6
-	sta temp7
-	sta temp8
-	sta addr_ptr
-	sta addr_ptr+1
-	sta pad_1
-	sta pad_1_prev
-	sta pad_2
-	sta pad_2_prev
-	sta spr_alloc
 
 	; Set up main and title screens
 	ldx #<main_comp
@@ -216,19 +273,15 @@ game_state_init:
 	lda #$20
 	jsr unpack_nt
 
-	ldx #<title_comp
-	ldy #>title_comp
-	lda #$24
-	jsr unpack_nt
-
 	lda #GAME_MODE_A
 	sta game_mode
 
-	; Load in a palette
-	ppu_load_spr_palette sample_spr_palette_data
-	ppu_load_bg_palette main_bg_palette
+	lda #GAME_START_DELAY
+	sta game_start_counter
+
 	jsr player_init
 	jsr fiends_init
+
 	rts
 
 main_comp:
@@ -246,7 +299,7 @@ sample_spr_palette_data:
 	.byte	$0F, $36, $30, $0F
 	.byte	$0F, $02, $24, $30
 	.byte	$0F, $06, $26, $30
-	.byte	$0F, $2C, $24, $2A
+	.byte	$0F, $30, $24, $16
 	; For a large project, palette data like this is often separated
 	; into a separate file and .incbin'd in, just like the other data.
 

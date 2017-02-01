@@ -12,14 +12,17 @@ player_render:
 	jsr player_draw
 	rts
 
-; Latch the player's display direction, only if not in the middle of a kick.
+; Latch the player's display direction if not in a special animation
 player_latch_dir:
 	lda player_kick_cnt
-	beq :+
-	rts
+	bne :+
+	lda player_death_cnt
+	bne :+
+	lda player_hurt_cnt
+	bne :+
+	ldx player_dir
+	stx player_disp_dir
 :
-	lda player_dir
-	sta player_disp_dir
 	rts
 
 ; Based on player state (position, action, etc) choose an animation sequence
@@ -28,6 +31,21 @@ player_latch_dir:
 ;	If appropriate, the player's animation number will have changed, and
 ;	the animation address will update as well.
 player_choose_animation:
+	lda player_death_cnt
+	beq @not_dying
+	lda #ANIM_DEATH
+	jsr player_set_anim_num
+	rts
+
+@not_dying:
+	lda player_hurt_cnt
+	beq @not_hurt
+	jsr player_reset_animation
+	lda #ANIM_HURT
+	jsr player_set_anim_num
+	rts
+
+@not_hurt:
 	lda player_kick_cnt
 	beq @not_kicking
 	lda player_disp_dir
@@ -201,6 +219,7 @@ player_animate:
 	; Otherwise, just increment the frame number.
 	sty player_anim_frame
 	rts
+
 @anim_loop:
 	; Get address of script into temp
 	lda player_anim_addr
@@ -219,12 +238,19 @@ player_animate:
 ; Preconditions:
 ;	addr_ptr is loaded with the address of the animation frame struct.
 player_draw:
-	ldx #$7F
-	ldy #$70
+	lda #$01
+	sta temp
+	lda player_hurt_cnt
+	beq :+
+	lda #$00
+	sta temp
+:
 	lda player_disp_dir
 	and #$01 ; Clamp to a flag dictating whether it should flip
-	eor #$01
+	eor temp ; Reverse it, unless it's the hurt anim
 	sta temp3
+	ldx #$7F
+	ldy #$70
 	jsr draw_metasprite
 	rts
 

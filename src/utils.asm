@@ -1,5 +1,29 @@
 .segment "FIXED"
 
+wait_nmi_srand:
+	lda pad_1
+	sta pad_1_prev
+	jsr read_joypads
+	key_isdown pad_1, btn_start
+	lda #$01
+	sta temp8
+:
+	lda temp8
+	bne :+
+	lda rand_seed
+	clc
+	adc #$01
+	sta rand_seed
+	lda rand_seed+1
+	adc #$00
+	sta rand_seed+1
+:
+	lda vblank_flag
+	bne wait_nmi_srand
+	lda #$01
+	sta vblank_flag
+	rts
+
 wait_nmi:
 	lda vblank_flag
 	bne wait_nmi			; Spin here until NMI lets us through
@@ -61,6 +85,7 @@ read_joy_safe:
 ; Clear the OAM table
 spr_init:
 	ldx #$00
+	stx spr_alloc
 	lda #$FF
 @clroam_loop:
 	sta OAM_BASE, x

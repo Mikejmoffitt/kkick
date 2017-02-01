@@ -10,6 +10,7 @@
 	jsr place_row
 .endmacro
 
+; ----------------------------------------------------------------------------
 place_row:
 	sta temp2
 
@@ -30,6 +31,7 @@ place_row:
 	sta temp
 	rts
 
+; ----------------------------------------------------------------------------
 put_num:
 	; temp: calculated low byte of PPUADDR
 	sta temp2
@@ -152,6 +154,7 @@ put_num:
 	put_row #$01, #$01, #$02
 	rts
 
+; ----------------------------------------------------------------------------
 draw_score:
 	ldx #$02
 	lda player_score
@@ -166,6 +169,7 @@ draw_score:
 	rts
 
 
+; ----------------------------------------------------------------------------
 score_add_point:
 	inc player_score
 	lda player_score
@@ -211,6 +215,7 @@ score_add_point:
 	sta player_lives
 	rts
 
+; ----------------------------------------------------------------------------
 ; Writes the number of lives as a little number next to the player icon
 draw_lives:
 	bit PPUSTATUS
@@ -225,8 +230,33 @@ draw_lives:
 	sta PPUDATA
 	rts
 
+; ----------------------------------------------------------------------------
+; Change the bar's palette based on health
+health_palette:
+	lda player_health
+	cmp #3
+	bne :+
+	lda #$2A
+	sta PPUDATA
+	rts
+:
+	cmp #2
+	bne :+
+	lda #$29
+	sta PPUDATA
+	rts
+:
+	cmp #1
+	bne :+
+	lda #$27
+	sta PPUDATA
+:
+	rts
+
+; ----------------------------------------------------------------------------
 ; Draws the health status bar.
 draw_health:
+; Backdrop tile placement.
 	bit PPUSTATUS
 	lda #$22
 	sta PPUADDR
@@ -235,12 +265,12 @@ draw_health:
 
 	ldx #$01
 	lda player_health
-	cmp #1
-	bcs :+
+	bne :+
 	ldx #$00
 :
 	stx PPUDATA
 	stx PPUDATA
+
 	ldx #$01
 	lda player_health
 	cmp #2
@@ -249,6 +279,7 @@ draw_health:
 :
 	stx PPUDATA
 	stx PPUDATA
+
 	ldx #$01
 	lda player_health
 	cmp #3
@@ -256,6 +287,13 @@ draw_health:
 	ldx #$00
 :
 	stx PPUDATA
+
 	stx PPUDATA
+	bit PPUSTATUS
+	lda #$3F
+	sta PPUADDR
+	lda #$A9
+	sta PPUADDR
+	jsr health_palette
 		
 	rts	

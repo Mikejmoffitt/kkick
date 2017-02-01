@@ -3,28 +3,26 @@ die1_dmc:
 	.incbin "resources/die1.dmc"
 .segment "FIXED"
 
-mus_idx_table:
-	.addr mus_kk_main
-
 mus_kk_main:
 	.include "../resources/kk_main.asm"
-
 
 die2_pcm:
 	.incbin "resources/die2.pcm"
 
+sound_init:
+	ldx #<mus_kk_main
+	ldy #>mus_kk_main
+	lda #$80
+	jsr FamiToneInit
+	rts
+
 ; Play the music speciifed in A
 play_track:
-	asl
-	tax
-	lda mus_idx_table+1, x
-	tay
-	lda mus_idx_table, x
-	tax
-	lda #80
-	jsr FamiToneInit
-	lda #$00
 	jsr FamiToneMusicPlay
+	rts
+
+stop_track:
+	jsr FamiToneMusicStop
 	rts
 
 ; DPCM playback for "WHOA" sound
