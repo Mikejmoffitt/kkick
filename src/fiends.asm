@@ -34,12 +34,14 @@ FIEND_SPAWN_RIGHT = ($7F + FIEND_SPAWN_DISTANCE)
 FIEND_SPAWN_TOP = ($70 - FIEND_SPAWN_DISTANCE/2)
 FIEND_SPAWN_BOTTOM = ($70 + FIEND_SPAWN_DISTANCE/2)
 
-FIEND_ANIM_PERIOD = 4
+FIEND_ANIM_PERIOD = 3
 FIEND_ANIM_LEN = 6
 
 KICK_THRESH = 10
 
 STAT_TABLE_ACC_PERIOD = 6
+
+FREEZE_FRAME_LEN = 3
 
 TABLE_END = $FFFF
 
@@ -637,7 +639,7 @@ fiend_animate:
 	lda fiend_anim_frame, x
 	clc
 	adc #$01
-	cmp #(FIEND_ANIM_LEN-1)
+	cmp #FIEND_ANIM_LEN
 	bne @no_phase_reset
 	lda #$00
 
@@ -885,6 +887,8 @@ fiend_eval_get_kicked:
 ; Kill off the dude
 fiend_die:
 ; TODO: Initialize dying animation instead of just voiping away.
+	;lda #FREEZE_FRAME_LEN
+	;sta freeze_frames
 	lda #FIEND_STATE_IDLE
 	sta fiend_state, x
 	jsr score_add_point

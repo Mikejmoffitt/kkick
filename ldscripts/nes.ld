@@ -12,7 +12,7 @@ MEMORY
     RAM:        start = $300, size=$500, file="";
 
     HEADER:     start = 0, size=$10, fill=yes, fillval=$FF;
-    ROM:        start = $8000, size = $7300, type = ro, file = %O, fill=yes, fillval=$EA;
+    ROM:        start = $8000, size = $7300, type = ro, file = %O, fill=yes, fillval=$00;
     DMC:        start = $F300, size = $CFA, type = ro, file = %O, fill=yes, fillval=$56;
     VEC:        start = $FFFA, size = $0006, type = ro, file = %O, fill=yes, fillval=$00;
     CHR:        start = 0, size = $2000, fill=yes, fillval = $55;

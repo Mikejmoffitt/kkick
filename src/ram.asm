@@ -51,6 +51,7 @@ fiends_gen_cnt:		.res 1		; countdown to spawning a bad dude
 fiends_speed:		.res 2		; 8.8 dx and (dy*2) for approaching
 
 fiends_gen_disable:	.res 1		; When nonzero, counts down and prevents enemy spawns
+freeze_frames:		.res 1
 
 fiend_xpos_hi:		.res (1 * NUM_FIENDS)
 fiend_ypos_hi:		.res (1 * NUM_FIENDS)
@@ -61,6 +62,7 @@ fiend_death_cnt:	.res (1 * NUM_FIENDS)
 fiend_dir:		.res (1 * NUM_FIENDS)
 fiend_anim_frame:	.res (1 * NUM_FIENDS)
 fiend_anim_delay:	.res (1 * NUM_FIENDS)
+
 
 .segment "RAM"
 
