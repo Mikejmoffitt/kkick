@@ -219,23 +219,15 @@ start_game:
 
 	; Run game logic here
 	jsr read_joy_safe
-	jsr FamiToneUpdate
-
-	lda freeze_frames
-	beq @skip_freeze
-	dec freeze_frames
-	jmp @end_of_logic
-
-@skip_freeze:
+	jsr music_logic
 	jsr fiends_logic
 	jsr player_logic
-	jsr misc_logic
+	; misc-Logic handled from audio now, don't ask
+	;jsr misc_logic
 	jsr player_render
 	jsr fiends_render
 	jsr misc_render
-	jmp @end_of_logic
 
-@end_of_logic:
 	; End of game logic frame; wait for NMI (vblank) to begin
 	jsr wait_nmi
 
@@ -289,9 +281,7 @@ game_state_init:
 
 	jsr player_init
 	jsr fiends_init
-
-	lda #$00
-	sta freeze_frames
+	jsr music_init
 
 	rts
 

@@ -171,6 +171,7 @@ draw_score:
 
 ; ----------------------------------------------------------------------------
 score_add_point:
+	jsr music_speedup
 	inc player_score
 	lda player_score
 	cmp #10
@@ -190,16 +191,20 @@ score_add_point:
 	adc #$01
 	sta player_score+2
 
-@inc_done: ; Done with BCD accumulation
+@inc_done: 
+	; Done with BCD accumulation
 
 ; Increment score accumulator for extra lives
 	lda player_score_acc
 	clc
 	adc #$01
 	sta player_score_acc
+
 	; mod 200 points?
 	cmp #200
 	beq @award_life
+
+
 	rts
 
 ; If score accumulator >= 200, give an extra life

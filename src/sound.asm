@@ -9,6 +9,71 @@ mus_kk_main:
 die2_pcm:
 	.incbin "resources/die2.pcm"
 
+music_init:
+	ldx #$00
+	stx sound_double_cnt
+	stx sound_double_delay
+	rts
+
+music_speedup:
+	lda sound_double_delay
+	cmp #02
+	bne :+
+	rts
+:
+	; Check if score is multiple of 16
+	lda player_score_acc
+	cmp #65
+	bne :+
+	lda #8
+	sta sound_double_delay
+	rts
+:
+	cmp #90
+	bne :+
+	lda #06
+	sta sound_double_delay
+	rts
+:
+	cmp #120
+	bne :+
+	lda #04
+	sta sound_double_delay
+	rts
+:
+	cmp #160
+	bne :+
+	lda #03
+	sta sound_double_delay
+	rts
+:
+	cmp #199
+	bne :+
+	lda #02
+	sta sound_double_delay
+:
+	rts
+
+; Runs music, makes it a bit faster if the game speeds up
+music_logic:
+	jsr misc_logic
+	jsr FamiToneUpdate
+
+	lda sound_double_delay
+	bne :+
+	rts
+:
+	lda sound_double_cnt
+	bne :+
+	jsr FamiToneUpdate
+	jsr misc_logic
+	lda sound_double_delay
+	sta sound_double_cnt
+	rts
+:
+	dec sound_double_cnt
+	rts
+
 sound_init:
 	ldx #<mus_kk_main
 	ldy #>mus_kk_main

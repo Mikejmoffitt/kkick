@@ -50,8 +50,9 @@ fiends_gen_period:	.res 1		; Period of spawn timing
 fiends_gen_cnt:		.res 1		; countdown to spawning a bad dude
 fiends_speed:		.res 2		; 8.8 dx and (dy*2) for approaching
 
+sound_double_delay:	.res 1
+sound_double_cnt:	.res 1
 fiends_gen_disable:	.res 1		; When nonzero, counts down and prevents enemy spawns
-freeze_frames:		.res 1
 
 fiend_xpos_hi:		.res (1 * NUM_FIENDS)
 fiend_ypos_hi:		.res (1 * NUM_FIENDS)

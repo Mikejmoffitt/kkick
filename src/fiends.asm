@@ -41,8 +41,6 @@ KICK_THRESH = 10
 
 STAT_TABLE_ACC_PERIOD = 6
 
-FREEZE_FRAME_LEN = 3
-
 TABLE_END = $FFFF
 
 ; Format is speed_lo, speed_hi, spawn period.
@@ -887,8 +885,6 @@ fiend_eval_get_kicked:
 ; Kill off the dude
 fiend_die:
 ; TODO: Initialize dying animation instead of just voiping away.
-	;lda #FREEZE_FRAME_LEN
-	;sta freeze_frames
 	lda #FIEND_STATE_IDLE
 	sta fiend_state, x
 	jsr score_add_point
