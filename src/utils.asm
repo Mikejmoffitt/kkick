@@ -4,7 +4,7 @@ wait_nmi_srand:
 	lda pad_1
 	sta pad_1_prev
 	jsr read_joypads
-	key_isdown pad_1, btn_start
+	key_down pad_1, btn_start
 	lda #$01
 	sta temp8
 :

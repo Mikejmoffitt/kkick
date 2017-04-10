@@ -286,9 +286,11 @@ OAM_BASE		= $200
 	sta yscroll+1
 
 	lda ppuctrl_config
-	ora xscroll+1	      ; Bring in X scroll coarse bit
-	ora yscroll+1	      ; Y scroll coarse bit
-	sta PPUCTRL		     ; Re-enable NMI
+	ora xscroll+1	; Bring in X scroll coarse bit
+	ror
+	ora yscroll+1	; Y scroll coarse bit
+	rol
+	sta PPUCTRL	; Re-enable NMI
 .endmacro
 
 ; Load a full palette

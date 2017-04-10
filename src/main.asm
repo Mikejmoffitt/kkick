@@ -79,9 +79,8 @@ reset_vector:
 
 ; Wait for first vblank
 @waitvbl1:
-	lda #$80
 	bit PPUSTATUS
-	bne @waitvbl1
+	bpl @waitvbl1
 
 ; Wait for the PPU to go stable
 	txa				; X still = 0; clear A with this
@@ -94,6 +93,7 @@ reset_vector:
 	sta $400, x
 	sta $500, x
 	sta $600, x
+	sta $700, x
 
 	inx
 	bne @clrmem
@@ -140,6 +140,9 @@ main_entry:
 	jsr spr_init
 	jsr sound_init
 
+	lda #$01
+	sta rand_seed
+
 title_screen:
 
 	jsr wait_nmi
@@ -160,6 +163,14 @@ title_screen:
 	sta temp8
 	ppu_enable
 
+
+@wait_nostart:
+	jsr read_joy_safe
+	jsr wait_nmi
+	jsr read_joy_safe
+
+	bne @wait_nostart
+	jsr wait_nmi
 
 
 @title_screen_top_loop:
