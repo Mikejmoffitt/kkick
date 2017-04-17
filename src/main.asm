@@ -84,7 +84,6 @@ reset_vector:
 
 ; Wait for the PPU to go stable
 	txa				; X still = 0; clear A with this
-	lda $55
 @clrmem:
 	sta $000, x
 	sta $100, x
